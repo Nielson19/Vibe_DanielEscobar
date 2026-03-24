@@ -1,58 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-
+from models import User, Account, Transaction
 # In a real application, these would be defined in separate files and use a database for storage.
 
 # NOTE: "to_dict" method is added to each model class to convert the object into a 
 # dictionary format that can be easily serialized to JSON when sending responses 
 # from the API endpoints.
-
-
-# MODELS
-
-# User model
-class User:
-	def __init__(self, user_id, name, email):
-		self.user_id = user_id
-		self.name = name
-		self.email = email
-
-	def to_dict(self):
-		return {
-			'user_id': self.user_id,
-			'name': self.name,
-			'email': self.email
-		}
-
-# Account model
-class Account:
-	def __init__(self, account_id, user_id, balance=0.0):
-		self.account_id = account_id
-		self.user_id = user_id
-		self.balance = balance
-
-	def to_dict(self):
-		return {
-			'account_id': self.account_id,
-			'user_id': self.user_id,
-			'balance': self.balance
-		}
-
-# Transaction model
-class Transaction:
-	def __init__(self, transaction_id, account_id, amount, type):
-		self.transaction_id = transaction_id
-		self.account_id = account_id
-		self.amount = amount
-		self.type = type  # 'deposit' or 'withdrawal'
-
-	def to_dict(self):
-		return {
-			'transaction_id': self.transaction_id,
-			'account_id': self.account_id,
-			'amount': self.amount,
-			'type': self.type
-		}
 
 
 # In-memory storage (for demonstration)
@@ -70,7 +23,6 @@ CORS(app)
 def index():
     return jsonify({"message": "Welcome to the Banking API"})
 
-
 # USER ENDPOINTS
 
 # Create a new user
@@ -81,6 +33,7 @@ def create_user():
 	user = User(user_id, data['name'], data['email'])
 	users[user_id] = user
 	return jsonify(user.to_dict()), 201
+
 
 @app.route('/users', methods=['GET'])
 def get_users():
@@ -147,4 +100,4 @@ def get_transactions():
 
 # makes sure that this file runs when the name is prompted on the terminal.
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(debug=True)         
