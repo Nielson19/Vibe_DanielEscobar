@@ -1,17 +1,13 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models import User, Account, Transaction
+from seed import users, accounts, transactions
 # In a real application, these would be defined in separate files and use a database for storage.
 
 # NOTE: "to_dict" method is added to each model class to convert the object into a 
 # dictionary format that can be easily serialized to JSON when sending responses 
 # from the API endpoints.
 
-
-# In-memory storage (for demonstration)
-users = {}
-accounts = {}
-transactions = {}
 
 # Flask app setup
 app = Flask(__name__)
