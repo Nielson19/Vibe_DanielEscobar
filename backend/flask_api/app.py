@@ -14,7 +14,6 @@ app = Flask(__name__)
 CORS(app)
 
 # MAIN
-
 @app.route('/')
 def index():
     return jsonify({"message": "Welcome to the Banking API"})
