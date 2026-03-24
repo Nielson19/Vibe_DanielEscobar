@@ -2,12 +2,20 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from models import User, Account, Transaction
 from seed import users, accounts, transactions
+import mysql.connector
 # In a real application, these would be defined in separate files and use a database for storage.
 
 # NOTE: "to_dict" method is added to each model class to convert the object into a 
 # dictionary format that can be easily serialized to JSON when sending responses 
 # from the API endpoints.
 
+#generate a connection to the MySQL database using the mysql.connector library.
+con=mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="bazinga2010.",
+    database="employee_db"
+)
 
 # Flask app setup
 app = Flask(__name__)
@@ -89,6 +97,7 @@ def create_transaction():
 					"transaction": transaction.to_dict(),
 					"currentBalance": account.balance}), 201
 
+# Get all transactions
 @app.route('/transactions', methods=['GET'])
 def get_transactions():
 	return jsonify([transaction.to_dict() for transaction in transactions.values()])
