@@ -17,9 +17,47 @@ con=mysql.connector.connect(
     database="simpleBank"
 )
 
+
 # Flask app setup
 app = Flask(__name__)
 CORS(app)
+
+# AUTH ROUTES
+
+# Register a new user (DB version)
+@app.route('/auth/register', methods=['POST'])
+def register():
+	data = request.get_json()
+	name = data.get("name")
+	email = data.get('email')
+	if not name or not email:
+		return jsonify({"error": "Name and email are required."}), 400
+	cursor = con.cursor()
+	cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+	if cursor.fetchone():
+		cursor.close()
+		return jsonify({"error": "Email already registered."}), 409
+	cursor.execute("INSERT INTO users (name, email) VALUES (%s, %s)", (name, email))
+	con.commit()
+	user_id = cursor.lastrowid
+	user = User(user_id, name, email)
+	cursor.close()
+	return jsonify({"message": f"User {name} registered successfully", "user": user.to_dict()}), 201
+
+# Login a user (DB version)
+@app.route('/auth/login', methods=['POST'])
+def login():
+	data = request.get_json()
+	email = data.get('email')
+	if not email:
+		return jsonify({"error": "Email is required."}), 400
+	cursor = con.cursor(dictionary=True)
+	cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+	user_data = cursor.fetchone()
+	cursor.close()
+	if not user_data:
+		return jsonify({"error": "User not found."}), 404
+	return jsonify({"message": "Login successful", "user": user_data}), 200
 
 # MAIN
 @app.route('/')
