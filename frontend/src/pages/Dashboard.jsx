@@ -41,7 +41,7 @@ export default function Dashboard() {
       }}
     >
       <Navbar userName={currentUser ? currentUser.name : "User"} />
-      <Table userId={currentUser ? currentUser.user_id : null}/>
+      {currentUser && <Table userId={currentUser.user_id} />}
     </div>
   );
 }

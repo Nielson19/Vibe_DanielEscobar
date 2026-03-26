@@ -14,23 +14,25 @@ function Table({ userId }) {
   const [newBalance, setNewBalance] = React.useState(0);
   const [newType, setNewType] = React.useState('checking');
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      if (userId) {
-        try {
-          const res = await getAccountsData(userId);
-          const userAccount = await getUserById(userId);
-          setAccountUser(userAccount.data.user.name);
-          setCurrentAccounts(res.data.accounts);
-        } catch (err) {
-          console.error("Error fetching user account:", err);
-        }
-      } else {
-        console.error("No user ID provided to Table component");
+  // Fetch data function to be reused
+  const fetchData = React.useCallback(async () => {
+    if (userId) {
+      try {
+        const res = await getAccountsData(userId);
+        const userAccount = await getUserById(userId);
+        setAccountUser(userAccount.data.user.name);
+        setCurrentAccounts(res.data.accounts);
+      } catch (err) {
+        console.error("Error fetching user account:", err);
       }
-    };
-    fetchData();
+    } else {
+      console.error("No user ID provided to Table component");
+    }
   }, [userId]);
+
+  React.useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleAddAccountClick = () => {
     setShowAddForm(true);
@@ -67,7 +69,8 @@ function Table({ userId }) {
     setShowAddForm(false);
     setNewBalance(0);
     setNewType('checking');
-    // Optionally refresh account list
+    // Refresh account list
+    fetchData();
   };
 
   return (
@@ -168,5 +171,6 @@ function Table({ userId }) {
     </div>
   );
 }
+
 
 export default Table
