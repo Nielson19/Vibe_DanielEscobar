@@ -20,6 +20,7 @@ class Account:
 		self.account_id = account_id
 		self.user_id = user_id
 		self.balance = balance
+		self.account_type = 'checking'  # default account type
 
 	def to_dict(self):
 		return {

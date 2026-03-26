@@ -1,59 +1,62 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login as loginApi, register as registerApi } from "../api/authApi";
 import { BsBank } from "react-icons/bs";
 import { FaLock, FaUserPlus } from "react-icons/fa";
 import bgImage from "../assets/bg-image.png";
 import { toast } from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
 
 export default function Auth() {
-
   const [mode, setMode] = useState("login"); // 'login' or 'register'
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { setUser, login: contextLogin, register: contextRegister } = useAuth();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // avoids refreshing
     setError("");
     setLoading(true);
     try {
-      const res = await loginApi({ email });
+      const res = await contextLogin(email, password);
       setLoading(false);
       if (res.data && res.data.user) {
+        setUser(res.data.user); // Store user info (including id) in context
         toast.success("Login successful");
         navigate("/dashboard");
       } else {
-        toast.error(res.data?.error || "Login failed"); // Show error toast if login fails
+        toast.error(res.data?.error || "Login failed");
         setError(res.data?.error || "Login failed");
       }
     } catch (err) {
       setLoading(false);
       toast.error(err.response?.data?.error || "Login failed");
-      setError(err.response?.data?.error || "Login failed"); // Show error toast if login fails
+      setError(err.response?.data?.error || "Login failed");
     }
   };
 
   const handleRegister = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // avoids refreshing
     setError("");
     setLoading(true);
     try {
-      const res = await registerApi({ name, email });
+      const res = await contextRegister(name, email, password);
       setLoading(false);
       if (res.data && res.data.user) {
+        setUser(res.data.user); // Store user info (including id) in context
         toast.success("Registration successful");
         navigate("/dashboard");
       } else {
         setError(res.data?.error || "Registration failed");
-        toast.error(res.data?.error || "Registration failed"); // Show error toast if registration fails
+        toast.error(res.data?.error || "Registration failed");
       }
     } catch (err) {
-        setLoading(false);
-        setError(err.response?.data?.error || "Registration failed");
-        toast.error(err.response?.data?.error || "Registration failed"); // Show error toast if registration fails
+      setLoading(false);
+      setError(err.response?.data?.error || "Registration failed");
+      toast.error(err.response?.data?.error || "Registration failed");
     }
   };
 
@@ -89,6 +92,18 @@ export default function Auth() {
               className="w-full px-3 py-2 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-opacity duration-200 bg-gray-700 text-gray-200"
               placeholder="Enter your email"
             />
+            <label htmlFor="login-password" className="block font-medium text-gray-300 mt-4">
+              Password
+            </label>
+            <input
+              id="login-password"
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              className="w-full mt-2 px-3 py-2 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-opacity duration-200 bg-gray-700 text-gray-200"
+              placeholder="Enter your password"
+            />  
           </div>
           <button
             type="submit"
@@ -151,6 +166,20 @@ export default function Auth() {
               required
               className="w-full px-3 py-2 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-opacity duration-200 bg-gray-700 text-gray-200"
               placeholder="Enter your email"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="register-password" className="block mb-2 font-medium text-gray-300">
+              Password
+            </label>
+            <input
+              id="register-password"
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-opacity duration-200 bg-gray-700 text-gray-200"
+              placeholder="Enter your password"
             />
           </div>
           <button

@@ -22,22 +22,28 @@ con=mysql.connector.connect(
 app = Flask(__name__)
 CORS(app)
 
+# MAIN
+@app.route('/')
+def index():
+    return jsonify({"message": "Welcome to Simple Bank"})
+
 # AUTH ROUTES
 
 # Register a new user (DB version)
 @app.route('/auth/register', methods=['POST'])
 def register():
-	data = request.get_json()
+	data = request.get_json() # this gets the credentials from the request body, which should include name, email, and password.
 	name = data.get("name")
 	email = data.get('email')
-	if not name or not email:
-		return jsonify({"error": "Name and email are required."}), 400
+	password = data.get('password')  # In a real application, you should hash the password before storing it.
+	if not name or not email or not password:
+		return jsonify({"error": "Name, email, and password are required."}), 400
 	cursor = con.cursor()
 	cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
 	if cursor.fetchone():
 		cursor.close()
 		return jsonify({"error": "Email already registered."}), 409
-	cursor.execute("INSERT INTO users (name, email) VALUES (%s, %s)", (name, email))
+	cursor.execute("INSERT INTO users (name, email, password) VALUES (%s, %s, %s)", (name, email, password))
 	con.commit()
 	user_id = cursor.lastrowid
 	user = User(user_id, name, email)
@@ -49,8 +55,9 @@ def register():
 def login():
 	data = request.get_json()
 	email = data.get('email')
-	if not email:
-		return jsonify({"error": "Email is required."}), 400
+	password = data.get('password')
+	if not email or not password:
+		return jsonify({"error": "Email and password are required."}), 400
 	cursor = con.cursor(dictionary=True)
 	cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
 	user_data = cursor.fetchone()
@@ -59,10 +66,10 @@ def login():
 		return jsonify({"error": "User not found."}), 404
 	return jsonify({"message": "Login successful", "user": user_data}), 200
 
-# MAIN
-@app.route('/')
-def index():
-    return jsonify({"message": "Welcome to Simple Bank"})
+@app.route('/auth/logout', methods=['POST'])
+def logout():
+	# In a real application, you would handle session management here.
+	return jsonify({"message": "Logout successful"}), 200	
 
 # USER ENDPOINTS
 
@@ -72,8 +79,9 @@ def create_user():
 	data = request.get_json()
 	name = data.get("name")
 	email = data.get('email')
+	password = data.get('password')  # In a real application, you should hash the password before storing it.
 	cursor = con.cursor()
-	cursor.execute("INSERT INTO users (name, email) VALUES (%s, %s)", (name, email))
+	cursor.execute("INSERT INTO users (name, email, password) VALUES (%s, %s, %s)", (name, email, password))
 	con.commit()
 	user_id = cursor.lastrowid
 	user = User(user_id, name, email)
@@ -90,8 +98,15 @@ def get_users():
 	cursor.close()
 	return jsonify({"users": users_data}), 200
 
-
-
+@app.route('/users/<int:user_id>', methods=['GET'])
+def get_user_by_id(user_id):
+	cursor = con.cursor(dictionary=True)
+	cursor.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+	user_data = cursor.fetchone()
+	cursor.close()
+	if not user_data:
+		return jsonify({"error": "User not found."}), 404
+	return jsonify({"user": user_data}), 200	
 # ACCOUNT ENDPOINTS
 
 # Create a new account for a user (DB version)
@@ -100,11 +115,12 @@ def create_account():
 	data = request.get_json()
 	user_id = data.get('user_id')
 	balance = data.get('balance', 0.0)
+	account_type = data.get('account_type', 'checking')
 	cursor = con.cursor()
-	cursor.execute("INSERT INTO accounts (user_id, balance) VALUES (%s, %s)", (user_id, balance))
+	cursor.execute("INSERT INTO accounts (user_id, balance, account_type) VALUES (%s, %s, %s)", (user_id, balance, account_type))
 	con.commit()
 	account_id = cursor.lastrowid
-	account = Account(account_id, user_id, balance)
+	account = Account(account_id, user_id, balance, account_type)
 	cursor.close()
 	return jsonify({ "message": f"Account for user_id {user_id} created successfully",
 					"account": account.to_dict()}), 201
@@ -118,7 +134,14 @@ def get_accounts():
 	cursor.close()
 	return jsonify({"accounts": accounts_data}), 200
 
-
+#List accounts for a specific user (DB version)
+@app.route('/accounts/user/<int:user_id>', methods=['GET'])
+def get_accounts_by_user(user_id):
+	cursor = con.cursor(dictionary=True)
+	cursor.execute("SELECT * FROM accounts WHERE user_id = %s", (user_id,))
+	accounts_data = cursor.fetchall()
+	cursor.close()
+	return jsonify({"accounts": accounts_data}), 200
 # TRANSACTION ENDPOINTS
 
 # Create a new transaction (deposit or withdrawal) (DB version)
