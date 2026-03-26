@@ -14,12 +14,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (user) {
-      const userId = user.user_id; // Replace with actual user ID from auth context or state
-      // Assuming getUserById is imported as user (should be renamed for clarity)
-      // If you want to use getUserById, import as getUserById and call getUserById(userId)
-      // Here, let's assume the import is correct
-      // If not, please adjust the import and usage accordingly
-      // user(userId) is confusing, so let's clarify:
+      const userId = user.user_id; 
       import("../api/accountApi").then(api => {
         api.getUserById(userId)
           .then(res => {
