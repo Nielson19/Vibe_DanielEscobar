@@ -4,7 +4,7 @@ import { BsBank } from "react-icons/bs";
 import bgImage from "../assets/bg-image.png";
 import Navbar from "../components/Navbar";
 import Table from "../components/Table";
-import {getUserById as user} from "../api/accountApi";
+import {getUserById, getUserById as user} from "../api/accountApi";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
@@ -13,21 +13,23 @@ export default function Dashboard() {
   const { user } = useAuth(); // Get the current user from the auth context
 
   useEffect(() => {
-    if (user) {
-      const userId = user.user_id; 
-      import("../api/accountApi").then(api => {
-        api.getUserById(userId)
-          .then(res => {
-            console.log("User account data:", res.data);
-            setCurrentUser(res.data.user);
-          })
-          .catch(err => {
-            console.error("Error fetching user account:", err);
-          });
-      });
-    } else {
-      console.error("No user found in auth context");
-    }
+    const fetchUserData = async () => {
+      if (user) {
+        const userId = user.user_id; 
+        try {
+          const res = await getUserById(userId);
+          setCurrentUser(res.data.user);
+          console.log("Fetched user data:", res.data.user);
+          console.log("User ID:", res.data.user.user_id);
+
+        } catch (err) {
+          console.error("Error fetching user account:", err);
+        }
+      } else {
+        console.error("No user found in auth context");
+      }
+    };
+    fetchUserData();
   }, [user]);
   return (
     <div
@@ -39,7 +41,7 @@ export default function Dashboard() {
       }}
     >
       <Navbar userName={currentUser ? currentUser.name : "User"} />
-      <Table />
+      <Table userId={currentUser ? currentUser.user_id : null}/>
     </div>
   );
 }

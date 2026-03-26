@@ -16,12 +16,11 @@ class User:
 
 # Account model
 class Account:
-	def __init__(self, account_id, user_id, balance=0.0):
+	def __init__(self, account_id, user_id, balance=0.0, account_type='checking'):
 		self.account_id = account_id
 		self.user_id = user_id
 		self.balance = balance
-		self.account_type = 'checking'  # default account type
-
+		self.account_type = account_type  # default account type
 	def to_dict(self):
 		return {
 			'account_id': self.account_id,
