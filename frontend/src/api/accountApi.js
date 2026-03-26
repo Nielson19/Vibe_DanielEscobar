@@ -6,3 +6,4 @@ export const getAccounts = () => axios.get('/accounts');
 export const getAccountsById = (id) => axios.get(`/accounts/user/${id}`);
 export const getUserById = (id) => axios.get(`/users/${id}`);
 export const addAccount = (userId, balance, type) => axios.post('/accounts', { user_id: userId, balance, account_type: type });
+export const removeAccount = (accountId) => axios.delete(`/accounts/${accountId}`);

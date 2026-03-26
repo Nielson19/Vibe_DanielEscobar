@@ -45,7 +45,7 @@ export default function MenuButton() {
                 <FaUserCircle size={40} className="text-yellow-400" />
             </Button>
       </div>
-     <div className='absolute top-10 right-0'>
+     <div>
         <Menu
             id="demo-positioned-menu"
             aria-labelledby="demo-positioned-button"
@@ -53,13 +53,12 @@ export default function MenuButton() {
             open={open}
             onClose={handleClose}
             anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
+              vertical: 'bottom',
+              horizontal: 'left',
             }}
             transformOrigin={{
-                
-            vertical: 'top',
-            horizontal: 'left',
+              vertical: 'top',
+              horizontal: 'left',
             }}
         > 
                 <MenuItem onClick={() => { handleClose(); handleLogOut();  }}><div className='text-red-500'><BsLock className='inline mr-2' />Logout</div></MenuItem>

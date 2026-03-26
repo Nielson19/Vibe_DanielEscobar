@@ -187,6 +187,18 @@ def create_transaction():
 					"currentBalance": new_balance}), 201
 
 
+# Delete an account by account_id (DB version)
+@app.route('/accounts/<int:account_id>', methods=['DELETE'])
+def delete_account(account_id):
+	cursor = con.cursor()
+	# Optionally, delete related transactions first if you want to enforce referential integrity
+	cursor.execute("DELETE FROM transactions WHERE account_id = %s", (account_id,))
+	cursor.execute("DELETE FROM accounts WHERE account_id = %s", (account_id,))
+	con.commit()
+	cursor.close()
+	return jsonify({"message": f"Account {account_id} deleted successfully."}), 200
+
+
 # Get all transactions (DB version)
 @app.route('/transactions', methods=['GET'])
 def get_transactions():

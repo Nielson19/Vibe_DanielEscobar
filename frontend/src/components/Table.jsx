@@ -1,11 +1,13 @@
 import React from 'react'
 import { MdOutlineAccountBalanceWallet } from "react-icons/md";
-import { getAccountsById as getAccountsData, getUserById, addAccount  } from "../api/accountApi";
-
+import { getAccountsById as getAccountsData, getUserById, addAccount, removeAccount  } from "../api/accountApi";
+import RowMenuButton from "./RowMenuButton";
 function Table({ userId }) {
   const rowStyle = "h-20 border-b items-center border-gray-700 hover:bg-gray-700/30 transition-colors w-1/4";
   const balanceStyle = "font-semibold text-gray-200 text-lg w-1/4";
-  const accountTypeStyle = "text-sm text-gray-400 w-1/4";
+  const accountNameStyle = "text-sm text-gray-400 w-1/4";
+  const accountTypeStyle = "text-sm text-gray-400 w-1/8";
+  const accountActionsStyle = " text-sm text-gray-400 w-1/8";
   const accountNumberStyle = "mt-6 flex flex-row justify-center items-center text-sm text-gray-400 w-1/4";
 
   const [currentAccounts, setCurrentAccounts] = React.useState(null);
@@ -72,6 +74,19 @@ function Table({ userId }) {
     // Refresh account list
     fetchData();
   };
+
+  const handleDeleteAccount = async (accountId) => {
+    try {
+      await removeAccount(accountId); // Replace with actual API call
+      console.log("Deleted account with ID:", accountId);
+      // Refresh account list
+      fetchData();
+    } catch (err) {
+      console.error("Error deleting account:", err);
+      // Optionally show error message to user
+    }
+  };
+
 
   return (
     <div className="bg-gray-800/40 backdrop-blur-md p-8 rounded-lg shadow-md w-full max-w-5xl border-2 border-gray-700">
@@ -148,7 +163,8 @@ function Table({ userId }) {
                 <th className="px-4 py-2 text-left font-semibold w-1/4">Account Name</th>
                 <th className="px-4 py-2 text-left font-semibold w-1/4">Account Number</th>
                 <th className="px-4 py-2 text-left font-semibold w-1/4">Balance</th>
-                <th className="px-4 py-2 text-left font-semibold w-1/4">Type</th>
+                <th className="px-4 py-2 text-left font-semibold w-1/8">Type</th>
+                <th className="px-4 py-2 text-left font-semibold w-1/8">Actions</th>
               </tr>
             </thead>
           </table>
@@ -157,10 +173,13 @@ function Table({ userId }) {
               <tbody>
                 {currentAccounts && currentAccounts.map((account) => (
                   <tr key={account.account_id} className={rowStyle}>
-                    <td className={`px-4 py-2 ${accountTypeStyle}`}>{`${accountUser} ${account.account_type} Account`}</td>
+                    <td className={`px-4 py-2 ${accountNameStyle}`}>{`${accountUser} ${account.account_type} Account`}</td>
                     <td className={`px-4 py-2 ${accountNumberStyle}`}>{account.account_id}</td>
                     <td className={`px-4 py-2 ${balanceStyle}`}>${Number(account.balance).toFixed(2)}</td>
                     <td className={`px-4 py-2 ${accountTypeStyle}`}>{account.account_type} </td>
+                    <td className={`px-4 py-2 justify-end items-end ${accountActionsStyle}`}>
+                      <RowMenuButton onDelete={() => handleDeleteAccount(account.account_id)} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
