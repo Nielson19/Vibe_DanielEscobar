@@ -1,21 +1,19 @@
-
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const { Transaction } = require('../models');
-const TransactionModel = mongoose.model('Transaction', new mongoose.Schema({
+const TransactionModel = mongoose.models.Transaction || mongoose.model('Transaction', new mongoose.Schema({
 	account_id: String,
 	amount: Number,
 	type: String, // 'deposit' or 'withdrawal'
 }));
-const AccountModel = mongoose.model('Account', new mongoose.Schema({
+const AccountModel = mongoose.models.Account || mongoose.model('Account', new mongoose.Schema({
 	user_id: String,
 	balance: Number,
 	account_type: String,
 }));
 
-// Create transaction
-router.post('/mongo/accounts/:account_id/transactions', async (req, res) => {
+// Create transaction for an account
+router.post('/account/:account_id', async (req, res) => {
 	const { account_id } = req.params;
 	const { amount, type } = req.body;
 	const account = await AccountModel.findById(account_id);
@@ -37,13 +35,13 @@ router.post('/mongo/accounts/:account_id/transactions', async (req, res) => {
 });
 
 // Get all transactions
-router.get('/mongo/transactions', async (req, res) => {
+router.get('/', async (req, res) => {
 	const txs = await TransactionModel.find();
 	res.json({ transactions: txs });
 });
 
 // Get transactions by account
-router.get('/mongo/accounts/:account_id/transactions', async (req, res) => {
+router.get('/account/:account_id', async (req, res) => {
 	const txs = await TransactionModel.find({ account_id: req.params.account_id });
 	res.json({ transactions: txs });
 });

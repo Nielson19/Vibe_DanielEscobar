@@ -2,15 +2,14 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const { Account } = require('../models');
-const AccountModel = mongoose.model('Account', new mongoose.Schema({
+const AccountModel = mongoose.models.Account || mongoose.model('Account', new mongoose.Schema({
 	user_id: String,
 	balance: Number,
 	account_type: { type: String, default: 'checking' },
 }));
 
-// Create account
-router.post('/mongo/users/:user_id/accounts', async (req, res) => {
+// Create account for a user
+router.post('/user/:user_id', async (req, res) => {
 	const { user_id } = req.params;
 	const { balance = 0.0, account_type = 'checking' } = req.body;
 	try {
@@ -23,7 +22,7 @@ router.post('/mongo/users/:user_id/accounts', async (req, res) => {
 });
 
 // Get all accounts
-router.get('/mongo/accounts', async (req, res) => {
+router.get('/', async (req, res) => {
 	try {
 		const accounts = await AccountModel.find();
 		res.json({ accounts });
@@ -33,7 +32,7 @@ router.get('/mongo/accounts', async (req, res) => {
 });
 
 // Get accounts by user
-router.get('/mongo/users/:user_id/accounts', async (req, res) => {
+router.get('/user/:user_id', async (req, res) => {
 	try {
 		const accounts = await AccountModel.find({ user_id: req.params.user_id });
 		res.json({ accounts });
@@ -43,7 +42,7 @@ router.get('/mongo/users/:user_id/accounts', async (req, res) => {
 });
 
 // Delete account (and related transactions)
-router.delete('/mongo/accounts/:account_id', async (req, res) => {
+router.delete('/:account_id', async (req, res) => {
 	try {
 		const accountId = req.params.account_id;
 		await mongoose.connection.collection('transactions').deleteMany({ account_id: accountId });
