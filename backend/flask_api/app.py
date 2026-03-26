@@ -186,6 +186,14 @@ def create_transaction():
 					"transaction": transaction.to_dict(),
 					"currentBalance": new_balance}), 201
 
+# Get transactions for a specific account
+@app.route('/transactions/account/<int:account_id>', methods=['GET'])
+def get_transactions_by_account(account_id):
+	cursor = con.cursor(dictionary=True)
+	cursor.execute("SELECT * FROM transactions WHERE account_id = %s", (account_id,))
+	transactions_data = cursor.fetchall()
+	cursor.close()
+	return jsonify({"transactions": transactions_data}), 200
 
 # Delete an account by account_id (DB version)
 @app.route('/accounts/<int:account_id>', methods=['DELETE'])

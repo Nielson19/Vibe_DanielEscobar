@@ -1,6 +1,7 @@
 import React from 'react'
 import { MdOutlineAccountBalanceWallet } from "react-icons/md";
-import { getAccountsById as getAccountsData, getUserById, addAccount, removeAccount  } from "../api/accountApi";
+import RightDrawer from './RightDrawer';
+import { getAccountsById as getAccountsData, getUserById, addAccount, removeAccount, getTransactionsByAccountId } from "../api/accountApi";
 import RowMenuButton from "./RowMenuButton";
 function Table({ userId }) {
   const rowStyle = "h-20 border-b items-center border-gray-700 hover:bg-gray-700/30 transition-colors w-1/4";
@@ -15,6 +16,27 @@ function Table({ userId }) {
   const [showAddForm, setShowAddForm] = React.useState(false);
   const [newBalance, setNewBalance] = React.useState(0);
   const [newType, setNewType] = React.useState('checking');
+
+  // Drawer state
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [drawerTransactions, setDrawerTransactions] = React.useState([]);
+  const [drawerAccountId, setDrawerAccountId] = React.useState(null);
+  // Open drawer and fetch transactions for account
+  const handleRowClick = async (accountId) => {
+    setDrawerAccountId(accountId);
+    setDrawerOpen(true);
+    try {
+      const res = await getTransactionsByAccountId(accountId);
+      setDrawerTransactions(res.data.transactions);
+    } catch (err) {
+      setDrawerTransactions([]);
+    }
+  };
+
+  // Called when a transaction is added in the drawer
+  const handleTransactionAdded = () => {
+    fetchData(); // Refresh account list to update balances
+  };
 
   // Fetch data function to be reused
   const fetchData = React.useCallback(async () => {
@@ -172,16 +194,23 @@ function Table({ userId }) {
             <table className="min-w-full text-sm text-gray-300">
               <tbody>
                 {currentAccounts && currentAccounts.map((account) => (
-                  <tr key={account.account_id} className={rowStyle}>
+                  <tr key={account.account_id} className={rowStyle + " cursor-pointer hover:bg-yellow-900/10"} onClick={() => handleRowClick(account.account_id)}>
                     <td className={`px-4 py-2 ${accountNameStyle}`}>{`${accountUser} ${account.account_type} Account`}</td>
                     <td className={`px-4 py-2 ${accountNumberStyle}`}>{account.account_id}</td>
                     <td className={`px-4 py-2 ${balanceStyle}`}>${Number(account.balance).toFixed(2)}</td>
                     <td className={`px-4 py-2 ${accountTypeStyle}`}>{account.account_type} </td>
-                    <td className={`px-4 py-2 justify-end items-end ${accountActionsStyle}`}>
+                    <td className={`px-4 py-2 justify-end items-end ${accountActionsStyle}`} onClick={e => e.stopPropagation()}>
                       <RowMenuButton onDelete={() => handleDeleteAccount(account.account_id)} />
                     </td>
                   </tr>
                 ))}
+                <RightDrawer
+                  open={drawerOpen}
+                  onClose={() => setDrawerOpen(false)}
+                  transactions={drawerTransactions}
+                  accountId={drawerAccountId}
+                  onTransactionAdded={handleTransactionAdded}
+                />
               </tbody>
             </table>
           </div>

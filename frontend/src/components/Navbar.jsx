@@ -11,7 +11,7 @@ export default function Navbar({ userName }) {
     <div className="flex flex-row justify-between items-center bg-gray-800/40 backdrop-blur-md p-8 rounded-xl shadow-md w-full max-w-5xl border-2 border-gray-700 md:flex-row md:items-center md:justify-between gap-4">
       <div className="flex flex-col items-start md:items-start">
         <h1 className="text-4xl font-bold text-gray-200 mb-1">👋 Welcome, {userName}!</h1>
-        <p className="text-gray-400 text-lg">{dateString}</p>
+        <p className="text-gray-300 text-lg">{dateString}</p>
       </div>
       <MenuButton />
       {/* Add navigation links here if needed */}
