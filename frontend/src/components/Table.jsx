@@ -4,12 +4,12 @@ import RightDrawer from './RightDrawer';
 import { getAccountsById as getAccountsData, getUserById, addAccount, removeAccount, getTransactionsByAccountId } from "../api/accountApi";
 import RowMenuButton from "./RowMenuButton";
 function Table({ userId }) {
-  const rowStyle = "h-20 border-b items-center border-gray-700 hover:bg-gray-700/30 transition-colors w-1/4";
-  const balanceStyle = "font-semibold text-gray-200 text-lg w-1/4";
-  const accountNameStyle = "text-sm text-gray-400 w-1/4";
-  const accountTypeStyle = "text-sm text-gray-400 w-1/8";
-  const accountActionsStyle = " text-sm text-gray-400 w-1/8";
-  const accountNumberStyle = "mt-6 flex flex-row justify-center items-center text-sm text-gray-400 w-1/4";
+  const rowStyle = "h-20 border-b items-center border-gray-700 hover:bg-gray-700/30 transition-colors w-[20%]";
+  const accountNameStyle = "text-md text-gray-400 w-[35%]";
+  const accountNumberStyle = "mt-6 flex flex-row justify-center text-left text-sm text-gray-400 w-[35%]";
+  const balanceStyle = "font-semibold text-gray-200 text-lg w-[10%]";
+  const accountTypeStyle = "text-lg text-gray-400 w-[10%]";
+  const accountActionsStyle = " text-sm text-gray-400 w-[10%]";
 
   const [currentAccounts, setCurrentAccounts] = React.useState(null);
   const [accountUser, setAccountUser] = React.useState(null);
@@ -182,11 +182,11 @@ function Table({ userId }) {
           <table className="table-fixed min-w-full text-sm text-gray-300">
             <thead>
               <tr className="bg-gray-700/60">
-                <th className="px-4 py-2 text-left font-semibold w-1/4">Account Name</th>
-                <th className="px-4 py-2 text-left font-semibold w-1/4">Account Number</th>
-                <th className="px-4 py-2 text-left font-semibold w-1/4">Balance</th>
-                <th className="px-4 py-2 text-left font-semibold w-1/8">Type</th>
-                <th className="px-4 py-2 text-left font-semibold w-1/8">Actions</th>
+                <th className="px-4 py-2 text-left font-semibold w-[35%]">Account Name</th>
+                <th className="px-4 py-2 text-left font-semibold w-[35%]">Account Number</th>
+                <th className="px-4 py-2 text-left font-semibold w-[10%]">Balance</th>
+                <th className="px-4 py-2 text-left font-semibold w-[10%]">Type</th>
+                <th className="px-4 py-2 text-left font-semibold w-[10%]">Actions</th>
               </tr>
             </thead>
           </table>
@@ -194,13 +194,13 @@ function Table({ userId }) {
             <table className="min-w-full text-sm text-gray-300">
               <tbody>
                 {currentAccounts && currentAccounts.map((account) => (
-                  <tr key={account.account_id} className={rowStyle + " cursor-pointer hover:bg-yellow-900/10"} onClick={() => handleRowClick(account.account_id)}>
+                  <tr key={account._id || account.account_id} className={rowStyle + " cursor-pointer hover:bg-yellow-900/10"} onClick={() => handleRowClick(account._id || account.account_id)}>
                     <td className={`px-4 py-2 ${accountNameStyle}`}>{`${accountUser} ${account.account_type} Account`}</td>
-                    <td className={`px-4 py-2 ${accountNumberStyle}`}>{account.account_id}</td>
+                    <td className={`px-4 py-2 ${accountNumberStyle}`}>{account._id || account.account_id}</td>
                     <td className={`px-4 py-2 ${balanceStyle}`}>${Number(account.balance).toFixed(2)}</td>
                     <td className={`px-4 py-2 ${accountTypeStyle}`}>{account.account_type} </td>
                     <td className={`px-4 py-2 justify-end items-end ${accountActionsStyle}`} onClick={e => e.stopPropagation()}>
-                      <RowMenuButton onDelete={() => handleDeleteAccount(account.account_id)} />
+                      <RowMenuButton onDelete={() => handleDeleteAccount(account._id || account.account_id)} />
                     </td>
                   </tr>
                 ))}

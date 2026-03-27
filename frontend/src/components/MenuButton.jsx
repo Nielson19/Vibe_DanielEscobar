@@ -4,13 +4,14 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { FaUserCircle } from "react-icons/fa";
 import { BsLock } from 'react-icons/bs';
-import { logout as logOutApi } from "../api/authApi";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 
 export default function MenuButton() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -23,7 +24,7 @@ export default function MenuButton() {
 
   const handleLogOut = async () => {
     try {
-        await logOutApi();
+        await logout();
         toast.success("Logout successful");
         navigate("/");
     } catch (error) {
