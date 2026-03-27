@@ -44,9 +44,9 @@ export default function RightDrawer({ open, onClose, transactions, accountId, on
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
-      <Box sx={{ width: 350, p: 2 }} role="presentation" className=" h-full">
-        <Typography variant="h5" className='text-black font-bold flex justify-center items-center' gutterBottom>
-          Account: 00000{accountId}
+      <Box variant="secondary" sx={{ width: 350, p: 2 }} role="presentation" className=" h-full">
+        <Typography variant="h6" className='text-black font-bold flex justify-center items-center' gutterBottom>
+          Account #{accountId}
         </Typography>
         <Divider className='bg-yellow-500' sx={{ mb: 2 }} />
         <FormLabel onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
@@ -87,10 +87,10 @@ export default function RightDrawer({ open, onClose, transactions, accountId, on
         {txList && txList.length > 0 ? (
           <List>
             {txList.map((tx) => (
-              <ListItem style={{ backgroundColor: "white", border: "1px solid black", marginBottom: "8px", borderRadius: "20px", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }} key={tx.transaction_id}>
+              <ListItem style={{ backgroundColor: "white", border: "1px solid black", marginBottom: "8px", borderRadius: "20px", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }} key={tx._id || tx.transaction_id}>
                 <ListItemText
                   primary={`${tx.type.charAt(0).toUpperCase() + tx.type.slice(1)}: $${Number(tx.amount).toFixed(2)}`}
-                  secondary={`Transaction ID: ${tx.transaction_id}`}
+                  secondary={`Transaction ID: ${tx._id || tx.transaction_id}`}
                 />
               </ListItem>
             ))}

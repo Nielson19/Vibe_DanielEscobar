@@ -42,6 +42,7 @@ pip-delete-this-directory.txt
 # Node modules
 node_modules/
 frontend/node_modules/
+backend/mongoDB/config.env
 
 # Unit test / coverage reports
 htmlcov/
